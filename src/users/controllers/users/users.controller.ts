@@ -9,16 +9,20 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dtos/CreateUser.dto';
+import { AuthGuard } from 'src/users/guards/auth/auth.guard';
+import { ValidateCreateUserPipe } from 'src/users/pipes/validate-create-user/validate-create-user.pipe';
 import { UsersService } from 'src/users/services/users/users.service';
 
 @Controller('users')
 export class UsersController {
   constructor(private userSevice: UsersService) {}
 
+  @UseGuards(AuthGuard)
   @Get()
   getUsers() {
     return this.userSevice.fetchUsers();
@@ -26,8 +30,8 @@ export class UsersController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  createUser(@Body() userData: CreateUserDto) {
-    // console.log(userData);
+  createUser(@Body(ValidateCreateUserPipe) userData: CreateUserDto) {
+    console.log(typeof userData.age);
     return this.userSevice.createUser(userData);
   }
 
